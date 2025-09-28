@@ -32,7 +32,5 @@ class SetupDatabase():
             print("Por favor, verifique se:")
             print("- O servidor PostgreSQL está rodando.")
             print("- As credenciais (usuário, senha, host, porta, nome do banco) estão corretas.")
-
-
-if __name__ == "__main__":
-    SetupDatabase.connection_database()
+        
+        return engine
