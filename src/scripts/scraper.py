@@ -4,7 +4,7 @@ import pandas as pd
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from utils.db import SetupDatabase
+from src.utils.db import SetupDatabase
 
 load_dotenv()
 
@@ -91,7 +91,7 @@ class ScraperBook():
             try:
                 engine = SetupDatabase.connection_database()
                 df = pd.DataFrame(scraper_books)
-                df.to_sql('book_api_fiap',engine,schema='scraper',if_exists='replace',index=False)
+                df.to_sql('book_api_fiap',engine,schema='scraper',if_exists='replace',index=True)
                 print("Dados salvos no banco de dados com sucesso!")
             except Exception as e:
                 print(f'Erro ao salvar no banco de dados: {e}')
