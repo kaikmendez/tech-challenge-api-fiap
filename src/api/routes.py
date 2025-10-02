@@ -1,39 +1,36 @@
-from fastapi import APIRouter, HTTPException
-from sqlalchemy import text
+from fastapi import APIRouter, HTTPException, Depends
 from src.utils.db import SetupDatabase
+import sqlite3
 
 router = APIRouter(prefix="/api/v1")
-engine = SetupDatabase.connection_database()
 
 @router.get("/")
 def index():
     return {"message": "Hello, World"}
 
 @router.get("/books")
-def get_all_books():
-    """
-    Retorna todos os livros disponíveis na base de dados.
-    """
-    with engine.connect() as coon:
-        result = coon.execute(text("SELECT title FROM scraper.book_api_fiap"))
-        books = [row[0] for row in result]
+def get_all_books(conexao: sqlite3.Connection = Depends(SetupDatabase.get_db_connection)):
+    # Agora, a variável 'conexao' é nova e segura para ser usada aqui
+    try:
+        conexao.row_factory = sqlite3.Row
+        cursor = conexao.cursor()
+        cursor.execute("SELECT * FROM book_api_fiap")
+        rows = cursor.fetchall()
+        books = [dict(row) for row in rows]
         return books
-    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao buscar livros: {e}")
+
 @router.get("/books/{id}")
-def get_book_by_id(id: int):
-    """
-    Busca os detalhes de um livro específico pelo seu ID.
-    """
-    with engine.connect() as coon:
-        query = text("SELECT title FROM scraper.book_api_fiap where id = :book_id")
-        result = coon.execute(query, {"book_id": id})
-        book = {"book": result.fetchone()}
-        if book is None:
+def get_book_by_id(id: int, conexao: sqlite3.Connection = Depends(SetupDatabase.get_db_connection)):
+    try:
+        conexao.row_factory = sqlite3.Row
+        cursor = conexao.cursor()
+        query = "SELECT * FROM book_api_fiap WHERE id = ?"
+        cursor.execute(query, (id,))
+        row = cursor.fetchone()
+        if row is None:
             raise HTTPException(status_code=404, detail="Livro não encontrado")
-        return book
-
-
-
-    
-
-    
+        return dict(row)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'Erro ao buscar livro: {e}')

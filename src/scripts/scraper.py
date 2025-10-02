@@ -86,12 +86,26 @@ class ScraperBook():
             except Exception as e:
                 print(f'Erro ao salvar em csv: {e}')
 
-    def save_on_db(self,scraper_books):
-        if scraper_books:
-            try:
-                engine = SetupDatabase.connection_database()
-                df = pd.DataFrame(scraper_books)
-                df.to_sql('book_api_fiap',engine,schema='scraper',if_exists='replace',index=True)
-                print("Dados salvos no banco de dados com sucesso!")
-            except Exception as e:
-                print(f'Erro ao salvar no banco de dados: {e}')
+    def save_on_db(self, scraper_books):
+        if not scraper_books:
+            return # Sai da função se não houver livros
+
+        conn = None # Garante que a variável exista
+        try:
+            conn = SetupDatabase.get_database_connection()
+            df = pd.DataFrame(scraper_books)
+            
+            df.to_sql(
+                'book_api_fiap',
+                con=conn,
+                if_exists='append',
+                index=False
+            )
+            print(f"{len(df)} registros salvos no banco de dados com sucesso!")
+
+        except Exception as e:
+            print(f'Erro ao salvar no banco de dados: {e}')
+        
+        finally:
+            if conn:
+                conn.close()

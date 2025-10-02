@@ -1,36 +1,48 @@
-import os
-from dotenv import load_dotenv
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, declarative_base
+import sqlite3
 
 class SetupDatabase():
 
     @staticmethod
-    def connection_database():
-        load_dotenv()
-
-        DB_USER  = os.getenv("DB_USER")
-        DB_PASSWORD  = os.getenv("DB_PASSWORD")
-        DB_HOST = os.getenv("DB_HOST")
-        DB_PORT = os.getenv("DB_PORT")
-        DB_NAME = os.getenv("DB_NAME")
-
-        DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
+    def setup_initial_database():
+        """
+        Cria a conexão e a tabela, depois fecha.
+        Deve ser chamada apenas uma vez.
+        """
+        conexao = None
         try:
-            engine = create_engine(DATABASE_URL, echo=False)
+            conexao = sqlite3.connect("book_api.db", check_same_thread=False)
+            cursor = conexao.cursor()
 
-            with engine.connect() as connection:
-                print("Conexão com o PostgreSQL realizada com sucesso!")
-
-                result = connection.execute(text("SELECT version()"))
-                for row in result:
-                    print(f"Versão do PostgreSQL: {row[0]}")
-
-        except Exception as e:
-            print(f"❌ Erro ao conectar ao banco de dados: {e}")
-            print("Por favor, verifique se:")
-            print("- O servidor PostgreSQL está rodando.")
-            print("- As credenciais (usuário, senha, host, porta, nome do banco) estão corretas.")
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS book_api_fiap (
+                id INTEGER PRIMARY KEY,
+                category TEXT,
+                title TEXT,
+                description TEXT,
+                price TEXT,
+                tax TEXT,
+                availability TEXT
+            )
+            ''')
+            
+            conexao.commit()
+            print("Banco de dados e tabela verificados/criados com sucesso.")
         
-        return engine
+        except sqlite3.Error as e:
+            print(f"Erro ao configurar o banco de dados: {e}")
+        
+        finally:
+            if conexao:
+                conexao.close()
+
+    @staticmethod
+    def get_db_connection():
+        """
+        Esta função cria uma nova conexão com o banco para cada requisição,
+        entrega para a rota e a fecha no final.
+        """
+        conexao = sqlite3.connect("book_api.db", check_same_thread=False)
+        try:
+            yield conexao
+        finally:
+            conexao.close()
