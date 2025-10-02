@@ -46,3 +46,12 @@ class SetupDatabase():
             yield conexao
         finally:
             conexao.close()
+
+    @staticmethod
+    def create_script_connection():
+        """
+        Cria e retorna uma conexão direta para ser usada em scripts.
+        Quem chama esta função é responsável por fechar a conexão.
+        """
+        conexao = sqlite3.connect("book_api.db", check_same_thread=False)
+        return conexao

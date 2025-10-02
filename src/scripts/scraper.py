@@ -92,7 +92,7 @@ class ScraperBook():
 
         conn = None # Garante que a variável exista
         try:
-            conn = SetupDatabase.get_database_connection()
+            conn = SetupDatabase.create_script_connection()
             df = pd.DataFrame(scraper_books)
             
             df.to_sql(
