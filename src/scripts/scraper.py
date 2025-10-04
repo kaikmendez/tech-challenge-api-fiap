@@ -21,7 +21,6 @@ class ScraperBook():
         all_books_data = []
         print("Starting the Web Scraping...")
 
-        # Começa na primeira página do catálogo
         url_join = urljoin(URL, "page-1.html")
 
         http_session = requests.Session()
@@ -88,18 +87,20 @@ class ScraperBook():
 
     def save_on_db(self, scraper_books):
         if not scraper_books:
-            return # Sai da função se não houver livros
+            return
 
-        conn = None # Garante que a variável exista
+        conn = None
         try:
             conn = SetupDatabase.create_script_connection()
             df = pd.DataFrame(scraper_books)
+            df.index = df.index + 1
             
             df.to_sql(
                 'book_api_fiap',
                 con=conn,
-                if_exists='append',
-                index=False
+                if_exists='replace',
+                index=True,
+                index_label='id'
             )
             print(f"{len(df)} registros salvos no banco de dados com sucesso!")
 

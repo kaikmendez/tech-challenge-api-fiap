@@ -1,4 +1,3 @@
-# Mantenha os mesmos imports
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from src.scripts.scraper import ScraperBook
@@ -19,21 +18,18 @@ async def lifespan(app: FastAPI):
 
     print("INFO:     Iniciando processo de scraping (aguarde, isso pode levar um minuto)...")
     
-    # Executa as funções diretamente, sem thread separada.
-    # O programa vai esperar aqui até que tudo termine.
     books = scraper.scrape_books()
     
     if books:
         print(f"INFO:     Scraping concluído. {len(books)} livros encontrados. Salvando dados...")
         
         scraper.save_to_csv(books)
-        scraper.save_on_db(books) # Esta função agora também será aguardada
+        scraper.save_on_db(books)
         
         print("INFO:     Salvamento de dados concluído.")
     else:
         print("WARNING:  Nenhum livro foi encontrado durante o scraping.")
     
-    # Somente DEPOIS de tudo acima terminar, a API ficará online.
     yield
     
     print("INFO:     API desligada.")
