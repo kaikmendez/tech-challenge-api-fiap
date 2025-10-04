@@ -8,7 +8,7 @@ router = APIRouter(prefix="/api/v1")
 
 @router.get("/")
 def index():
-    return {"message": "Bem-vindo à API de Livros! Acesse /docs para a documentação."}
+    return {"message": "Bem-vindo à API de Livros! Acesse /docs para ver a documentação."}
 
 @router.get("/books")
 def get_all_books(conexao: sqlite3.Connection = Depends(SetupDatabase.get_db_connection)):
