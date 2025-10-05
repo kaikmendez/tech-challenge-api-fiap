@@ -102,7 +102,7 @@ Verifica o status da API e a conectividade com o banco de dados.
 Retorna uma lista de todos os livros disponíveis na base de dados.
 
 * **Endpoint:** `GET /api/v1/books`
-* [cite_start]**Exemplo de Resposta:**
+* **Exemplo de Resposta:**
     ```json
     [
       {
@@ -117,10 +117,10 @@ Retorna uma lista de todos os livros disponíveis na base de dados.
     ```
 
 #### Buscar Livro por ID
-[cite_start]Retorna os detalhes de um livro específico pelo seu ID.
+Retorna os detalhes de um livro específico pelo seu ID.
 
 * **Endpoint:** `GET /api/v1/books/{id}`
-* [cite_start]**Exemplo de Resposta (id=1):**
+* **Exemplo de Resposta (id=1):**
     ```json
     {
       "id": 1,
@@ -134,7 +134,7 @@ Retorna uma lista de todos os livros disponíveis na base de dados.
     ```
 
 #### Listar Categorias
-[cite_start]Retorna uma lista com todas as categorias de livros únicas.
+Retorna uma lista com todas as categorias de livros únicas.
 
 * **Endpoint:** `GET /api/v1/categories`
 * **Exemplo de Resposta:**
@@ -216,13 +216,13 @@ O código do projeto está organizado em módulos para facilitar a manutenção 
 .
 ├── .venv/                  # Ambiente virtual
 ├── src/                    # Código fonte da aplicação
+|   ├── template/           # Arquivos estáticos (ex: index.html) 
+|   |   └── index.html                      
 │   ├── api/                # Módulos da API (rotas, modelos, autenticação)
 │   ├── scripts/            # Scripts independentes (ex: scraper)
-│   ├── utils/              # Funções utilitárias (ex: conexão com DB)
-│   └── main.py             # Arquivo principal da aplicação FastAPI
-├── static/                 # Arquivos estáticos (ex: index.html)
-│   └── index.html
+│   └── utils/              # Funções utilitárias (ex: conexão com DB)
 ├── book_api.db             # Arquivo do banco de dados SQLite
+├── main.py                 # Arquivo principal da aplicação FastAPI                            
 ├── requirements.txt        # Dependências do projeto
-└── README.md               # Esta documentação
+└── README.md               # Documentação
 ```
