@@ -10,6 +10,52 @@ router = APIRouter(prefix="/api/v1")
 def index():
     return {"message": "Bem-vindo à API de Livros! Acesse /docs para ver a documentação."}
 
+@router.get("/books/search")
+def search_books(
+    title: Optional[str] = None, 
+    category: Optional[str] = None,
+    conexao: sqlite3.Connection = Depends(SetupDatabase.get_db_connection)
+):
+    """
+    Busca livros por título e/ou categoria.
+    """
+    if not title and not category:
+        raise HTTPException(
+            status_code=400, 
+            detail="Forneça um 'title' ou 'category' para a busca."
+        )
+    
+    try:
+        conexao.row_factory = sqlite3.Row
+        cursor = conexao.cursor()
+
+        query_base = "SELECT * FROM book_api_fiap WHERE "
+        conditions = []
+        params = []
+
+        if title:
+            # Usamos LIKE para busca parcial e case-insensitive
+            conditions.append("lower(title) LIKE ?")
+            params.append(f"%{title.lower()}%")
+        
+        if category:
+            # Usamos = para busca exata e case-insensitive na categoria
+            conditions.append("lower(category) = ?")
+            params.append(category.lower())
+
+        # AQUI ESTÁ A MUDANÇA: Usamos 'OR' para uma busca "E/OU"
+        # Isso retornará livros que correspondam ao título OU à categoria.
+        query_final = query_base + " OR ".join(conditions)
+        
+        cursor.execute(query_final, tuple(params))
+        rows = cursor.fetchall()
+        
+        books = [dict(row) for row in rows]
+        return books
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao buscar livro: {e}")
+
 @router.get("/books")
 def get_all_books(conexao: sqlite3.Connection = Depends(SetupDatabase.get_db_connection)):
     try:
@@ -35,51 +81,6 @@ def get_book_by_id(id: int, conexao: sqlite3.Connection = Depends(SetupDatabase.
         return dict(row)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Erro ao buscar livro: {e}')
-
-@router.get("/books/search")
-def search_books(title: Optional[str] = None, category: Optional[str] = None, conexao: sqlite3.Connection = Depends(SetupDatabase.get_db_connection)):
-    """
-    Busca livros por título e/ou categoria.
-    A busca por título é parcial e case-insensitive.
-    """
-    if not title and not category:
-        raise HTTPException(
-            status_code=400, 
-            detail="Forneça um 'title' ou 'category' para a busca."
-        )
-    
-    try:
-        conexao.row_factory = sqlite3.Row
-        cursor = conexao.cursor()
-
-        # --- Lógica de busca simplificada ---
-
-        query_base = "SELECT * FROM book_api_fiap WHERE "
-        conditions = []
-        params = []
-
-        # Adiciona a condição de título, se existir
-        if title:
-            conditions.append("lower(title) LIKE ?")
-            params.append(f"%{title.lower()}%")
-        
-        # Adiciona a condição de categoria, se existir
-        if category:
-            # Usamos '=' para categoria, pois geralmente é uma busca exata
-            conditions.append("lower(category) = ?")
-            params.append(category.lower())
-
-        # Junta as condições com 'AND'
-        query_final = query_base + " AND ".join(conditions)
-        
-        cursor.execute(query_final, tuple(params))
-        rows = cursor.fetchall()
-        
-        books = [dict(row) for row in rows]
-        return books
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao buscar livro: {e}")
     
 @router.get("/categories")
 def categories(conexao: sqlite3.Connection = Depends(SetupDatabase.get_db_connection)):
