@@ -148,7 +148,7 @@ Retorna uma lista com todas as categorias de livros únicas.
     ```
     
 #### Buscar Livros (Filtro)
-Busca livros por título e/ou categoria. [cite: 58] A busca é opcional e combinada com `OR`.
+Busca livros por título e/ou categoria. A busca é opcional e combinada com `OR`.
 
 * **Endpoint:** `GET /api/v1/books/search`
 * **Parâmetros de Consulta:**
