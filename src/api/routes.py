@@ -3,6 +3,14 @@ from fastapi import APIRouter, HTTPException, Depends
 from src.utils.db import SetupDatabase
 from typing import Optional
 from src.api.models import HealthStatus
+from fastapi.security import OAuth2PasswordRequestForm
+from datetime import timedelta
+from .auth import (
+    verify_password,
+    create_access_token,
+    get_current_user,
+    ACCESS_TOKEN_EXPIRE_MINUTES
+)
 
 router = APIRouter(prefix="/api/v1")
 
@@ -123,3 +131,50 @@ def health_check():
         db_status = "error"
 
     return {"api_status": api_status, "db_status": db_status}
+
+# --- BANCO DE DADOS DE USUÁRIOS SIMULADO ---
+# Em um projeto real, isso viria de um banco de dados.
+# A senha 'testpassword' foi "hasheada" e o resultado está abaixo.
+fake_users_db = {
+    "admin": {
+        "username": "admin",
+        "hashed_password": "$2b$12$EixZaYVK1e.JSs3J2o.4V.5n8h.y0p343b3hJ5wA5U3u.O5b.Bqje",
+        "role": "admin"
+    }
+}
+
+# --- ROTA DE LOGIN ---
+@router.post("/auth/login", tags=["Autenticação"])
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """
+    Autentica um usuário e retorna um token de acesso JWT.
+    """
+    user = fake_users_db.get(form_data.username)
+    if not user or not verify_password(form_data.password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user["username"]}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+# --- ROTA PROTEGIDA ---
+@router.post("/scraping/trigger", tags=["Admin"])
+def trigger_scraping(current_user: dict = Depends(get_current_user)):
+    """
+    Um endpoint protegido que só pode ser acessado com um token JWT válido.
+    Inicia o processo de scraping.
+    """
+    # O código aqui só será executado se o token for válido.
+    # A variável 'current_user' contém o payload do token (ex: {"username": "admin"}).
+    
+    print(f"Scraping iniciado pelo usuário: {current_user['username']}")
+    # --- Coloque sua lógica de scraping aqui ---
+    # scraper = ScraperBook()
+    # ...
+    return {"message": f"Scraping iniciado com sucesso pelo usuário {current_user['username']}!"}
