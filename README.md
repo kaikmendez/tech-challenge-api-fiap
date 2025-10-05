@@ -9,15 +9,15 @@
 
 Este projeto consiste na criação de uma API pública para consulta de livros, desenvolvida como parte do Tech Challenge da Fase 1 de Machine Learning Engineering. O objetivo principal é construir um pipeline completo, desde a extração de dados via web scraping, passando pelo armazenamento e transformação, até a disponibilização desses dados através de uma API RESTful robusta e documentada.
 
-[cite_start]A arquitetura foi pensada para ser modular e escalável, servindo como a base para futuros sistemas de recomendação e modelos de Machine Learning. [cite: 12, 17]
+A arquitetura foi pensada para ser modular e escalável, servindo como a base para futuros sistemas de recomendação e modelos de Machine Learning.
 
 ## 🏛️ Arquitetura
 
 O projeto segue uma arquitetura simples e desacoplada:
 
-1.  **Web Scraper (`/scripts`):** Um script Python responsável por extrair os dados do site [books.toscrape.com](https://books.toscrape.com/) e salvá-los em um banco de dados.
-2.  **Banco de Dados (`/database`):** Um banco de dados SQLite (`book_api.db`) é utilizado para armazenar os dados dos livros de forma estruturada. Ele é criado e populado na inicialização da aplicação.
-3.  **API RESTful (`/api`):** Construída com FastAPI, a API expõe os dados do banco através de diversos endpoints, com lógica de negócios, validação e autenticação.
+1.  **Web Scraper (`src/scripts`):** Um script Python responsável por extrair os dados do site [books.toscrape.com](https://books.toscrape.com/) e salvá-los em um banco de dados.
+2.  **Banco de Dados (`src/Utils`):** Um banco de dados SQLite (`book_api.db`) é utilizado para armazenar os dados dos livros de forma estruturada. Ele é criado e populado na inicialização da aplicação.
+3.  **API RESTful (`src/api`):** Construída com FastAPI, a API expõe os dados do banco através de diversos endpoints, com lógica de negócios, validação e autenticação.
 4.  **Cliente:** Qualquer aplicação que consuma os dados da API (navegador, outra aplicação, etc.).
 
 ## 🛠️ Tecnologias Utilizadas
@@ -32,7 +32,7 @@ O projeto segue uma arquitetura simples e desacoplada:
 
 ## ⚙️ Instalação e Configuração
 
-[cite_start]Siga os passos abaixo para configurar e executar o projeto em seu ambiente local. [cite: 18]
+Siga os passos abaixo para configurar e executar o projeto em seu ambiente local.
 
 **1. Clone o Repositório**
 ```bash
@@ -44,7 +44,7 @@ cd <nome-do-seu-repositorio>
 É altamente recomendado usar um ambiente virtual para isolar as dependências do projeto.
 ```bash
 # Criar o ambiente virtual
-python3 -m venv venv
+python3 -m venv .venv
 
 # Ativar no Linux/macOS
 source venv/bin/activate
@@ -61,7 +61,7 @@ pip install -r requirements.txt
 
 ## ▶️ Instruções para Execução
 
-[cite_start]Com o ambiente configurado, inicie a aplicação com o servidor Uvicorn. [cite: 21]
+Com o ambiente configurado, inicie a aplicação com o servidor Uvicorn.
 
 ```bash
 uvicorn src.main:app --reload
@@ -81,16 +81,16 @@ A API possui uma documentação interativa (Swagger UI) gerada automaticamente p
 
 **`http://127.0.0.1:8000/docs`**
 
-[cite_start]Abaixo estão listados os principais endpoints disponíveis. [cite: 19]
+Abaixo estão listados os principais endpoints disponíveis.
 
 ---
 ### Endpoints Públicos
 
 #### Health Check
-[cite_start]Verifica o status da API e a conectividade com o banco de dados. [cite: 60]
+Verifica o status da API e a conectividade com o banco de dados.
 
 * **Endpoint:** `GET /api/v1/health`
-* [cite_start]**Exemplo de Resposta (Sucesso):** [cite: 20]
+* **Exemplo de Resposta (Sucesso):**
     ```json
     {
       "api_status": "ok",
@@ -99,10 +99,10 @@ A API possui uma documentação interativa (Swagger UI) gerada automaticamente p
     ```
 
 #### Listar Todos os Livros
-[cite_start]Retorna uma lista de todos os livros disponíveis na base de dados. [cite: 55]
+Retorna uma lista de todos os livros disponíveis na base de dados.
 
 * **Endpoint:** `GET /api/v1/books`
-* [cite_start]**Exemplo de Resposta:** [cite: 20]
+* [cite_start]**Exemplo de Resposta:**
     ```json
     [
       {
@@ -117,10 +117,10 @@ A API possui uma documentação interativa (Swagger UI) gerada automaticamente p
     ```
 
 #### Buscar Livro por ID
-[cite_start]Retorna os detalhes de um livro específico pelo seu ID. [cite: 57]
+[cite_start]Retorna os detalhes de um livro específico pelo seu ID.
 
 * **Endpoint:** `GET /api/v1/books/{id}`
-* [cite_start]**Exemplo de Resposta (id=1):** [cite: 20]
+* [cite_start]**Exemplo de Resposta (id=1):**
     ```json
     {
       "id": 1,
@@ -134,10 +134,10 @@ A API possui uma documentação interativa (Swagger UI) gerada automaticamente p
     ```
 
 #### Listar Categorias
-[cite_start]Retorna uma lista com todas as categorias de livros únicas. [cite: 59]
+[cite_start]Retorna uma lista com todas as categorias de livros únicas.
 
 * **Endpoint:** `GET /api/v1/categories`
-* [cite_start]**Exemplo de Resposta:** [cite: 20]
+* **Exemplo de Resposta:**
     ```json
     [
       "Add a comment",
@@ -148,17 +148,17 @@ A API possui uma documentação interativa (Swagger UI) gerada automaticamente p
     ```
     
 #### Buscar Livros (Filtro)
-[cite_start]Busca livros por título e/ou categoria. [cite: 58] A busca é opcional e combinada com `OR`.
+Busca livros por título e/ou categoria. [cite: 58] A busca é opcional e combinada com `OR`.
 
 * **Endpoint:** `GET /api/v1/books/search`
 * **Parâmetros de Consulta:**
     * `title` (opcional): Parte do título do livro.
     * `category` (opcional): Nome da categoria.
-* [cite_start]**Exemplo de Chamada:** [cite: 20]
+* **Exemplo de Chamada:**
     ```bash
     curl -X GET "[http://127.0.0.1:8000/api/v1/books/search?category=Music](http://127.0.0.1:8000/api/v1/books/search?category=Music)"
     ```
-* [cite_start]**Exemplo de Resposta:** [cite: 20]
+* **Exemplo de Resposta:**
     ```json
     [
       {
@@ -174,13 +174,13 @@ A API possui uma documentação interativa (Swagger UI) gerada automaticamente p
 ### Endpoints de Autenticação
 
 #### Obter Token de Acesso
-[cite_start]Autentica um usuário com `username` e `password` e retorna um token de acesso JWT. [cite: 74]
+Autentica um usuário com `username` e `password` e retorna um token de acesso JWT.
 
 * **Endpoint:** `POST /api/v1/auth/login`
 * **Corpo da Requisição:** `application/x-www-form-urlencoded`
     * `username`: "admin"
     * `password`: "testpassword"
-* [cite_start]**Exemplo de Resposta:** [cite: 20]
+* **Exemplo de Resposta:**
     ```json
     {
       "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -192,16 +192,16 @@ A API possui uma documentação interativa (Swagger UI) gerada automaticamente p
 ### Endpoints Protegidos
 
 #### Disparar Web Scraping
-Endpoint de exemplo protegido por autenticação JWT. [cite_start]Somente usuários autenticados podem acioná-lo. [cite: 76]
+Endpoint de exemplo protegido por autenticação JWT. Somente usuários autenticados podem acioná-lo.
 
 * **Endpoint:** `POST /api/v1/scraping/trigger`
 * **Autenticação:** Requer um token JWT no cabeçalho `Authorization`.
     * `Authorization: Bearer <seu_token_jwt>`
-* [cite_start]**Exemplo de Chamada:** [cite: 20]
+* **Exemplo de Chamada:**
     ```bash
     curl -X POST "[http://127.0.0.1:8000/api/v1/scraping/trigger](http://127.0.0.1:8000/api/v1/scraping/trigger)" -H "Authorization: Bearer eyJhbGciOiJI..."
     ```
-* [cite_start]**Exemplo de Resposta:** [cite: 20]
+* **Exemplo de Resposta:**
     ```json
     {
       "message": "Scraping iniciado com sucesso pelo usuário admin!"
@@ -210,7 +210,7 @@ Endpoint de exemplo protegido por autenticação JWT. [cite_start]Somente usuár
 
 ## 🗂️ Estrutura do Projeto
 
-[cite_start]O código do projeto está organizado em módulos para facilitar a manutenção e escalabilidade. [cite: 15]
+O código do projeto está organizado em módulos para facilitar a manutenção e escalabilidade.
 
 ```
 .
