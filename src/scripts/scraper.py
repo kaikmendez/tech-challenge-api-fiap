@@ -50,8 +50,8 @@ class ScraperBook():
                 else:
                     product_description = ''
                 price = soup_book.find('table', class_='table table-striped').find_all('tr')[3].find('td').text
-                tax = soup_book.find('table', class_='table table-striped').find_all('tr')[5].find('td').text
-                availability = soup_book.find('table', class_='table table-striped').find_all('tr')[6].find('td').text
+                tax = soup_book.find('table', class_='table table-striped').find_all('tr')[4].find('td').text
+                availability = soup_book.find('table', class_='table table-striped').find_all('tr')[5].find('td').text
 
                 dict_book = {
                     "category": category_name,

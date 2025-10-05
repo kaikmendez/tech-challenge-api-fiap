@@ -51,23 +51,31 @@ def search_books(title: Optional[str] = None, category: Optional[str] = None, co
     try:
         conexao.row_factory = sqlite3.Row
         cursor = conexao.cursor()
-        query = ("SELECT * FROM book_api_fiap WHERE ")
+
+        # --- Lógica de busca simplificada ---
+
+        query_base = "SELECT * FROM book_api_fiap WHERE "
         conditions = []
         params = []
 
+        # Adiciona a condição de título, se existir
         if title:
-            conditions.append("lower(title) like ?")
-            params.append(f"%{title.lower}%")
-
+            conditions.append("lower(title) LIKE ?")
+            params.append(f"%{title.lower()}%")
+        
+        # Adiciona a condição de categoria, se existir
         if category:
-            conditions.append("lower(category) like ?")
-            params.append(f"%{category.lower}%")
+            # Usamos '=' para categoria, pois geralmente é uma busca exata
+            conditions.append("lower(category) = ?")
+            params.append(category.lower())
 
-        query = query + " AND ".join(conditions)
-        cursor.execute(query, tuple(params))
+        # Junta as condições com 'AND'
+        query_final = query_base + " AND ".join(conditions)
+        
+        cursor.execute(query_final, tuple(params))
         rows = cursor.fetchall()
+        
         books = [dict(row) for row in rows]
-
         return books
     
     except Exception as e:
@@ -78,7 +86,7 @@ def categories(conexao: sqlite3.Connection = Depends(SetupDatabase.get_db_connec
     try:
         conexao.row_factory = sqlite3.Row
         cursor = conexao.cursor()
-        query = "SELECT DISTINCT category FROM book_api_fiap ORDER BY category"
+        query = "SELECT DISTINCT category FROM book_api_fiap WHERE lower(availability) LIKE '%in stock%' ORDER BY category"
         cursor.execute(query)
         rows = cursor.fetchall()
         categories = [row['category'] for row in rows]
