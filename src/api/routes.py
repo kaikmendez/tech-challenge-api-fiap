@@ -1,9 +1,10 @@
 import sqlite3
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from src.utils.db import SetupDatabase
 from typing import Optional
 from src.api.models import HealthStatus
 from fastapi.security import OAuth2PasswordRequestForm
+from src.scripts.scraper import ScraperBook
 from datetime import timedelta
 from .auth import (
     verify_password,
@@ -112,9 +113,6 @@ def health_check():
     db_status = "disconnected"
 
     try:
-        # Tenta criar uma conexão rápida com o banco para verificar a conectividade
-        # Usamos uma conexão separada aqui para não depender da injeção de dependência,
-        # pois queremos controlar a resposta mesmo em caso de falha.
         conexao = sqlite3.connect("book_api.db", timeout=1)
         
         # Se a conexão foi bem-sucedida, tentamos executar uma consulta simples.
@@ -143,19 +141,24 @@ fake_users_db = {
     }
 }
 
-# --- ROTA DE LOGIN ---
 @router.post("/auth/login", tags=["Autenticação"])
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Autentica um usuário e retorna um token de acesso JWT.
     """
     user = fake_users_db.get(form_data.username)
-    if not user or not verify_password(form_data.password, user["hashed_password"]):
+
+    password_to_check = form_data.password[:72]
+    # --------------------------------
+
+    # Usa a senha truncada na verificação para garantir consistência.
+    if not user or not verify_password(password_to_check, user["hashed_password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user["username"]}, expires_delta=access_token_expires
@@ -163,7 +166,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-# --- ROTA PROTEGIDA ---
 @router.post("/scraping/trigger", tags=["Admin"])
 def trigger_scraping(current_user: dict = Depends(get_current_user)):
     """
@@ -174,7 +176,11 @@ def trigger_scraping(current_user: dict = Depends(get_current_user)):
     # A variável 'current_user' contém o payload do token (ex: {"username": "admin"}).
     
     print(f"Scraping iniciado pelo usuário: {current_user['username']}")
-    # --- Coloque sua lógica de scraping aqui ---
-    # scraper = ScraperBook()
-    # ...
-    return {"message": f"Scraping iniciado com sucesso pelo usuário {current_user['username']}!"}
+    
+    scraper = ScraperBook()
+    books = scraper.scrape_books()
+    if books:
+        scraper.save_on_db(books)
+        print("INFO:     Scraping e salvamento de dados concluídos.")
+    else:
+        print("WARNING:  Nenhum livro foi encontrado durante o scraping.")

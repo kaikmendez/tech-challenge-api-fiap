@@ -33,13 +33,24 @@
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #007bff;
-            color: white;
+            color: #FFFFFF;
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
         }
         a:hover {
             background-color: #0056b3;
+        }
+        footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -49,5 +60,12 @@
         <p>Este é o projeto do Tech Challenge de Machine Learning Engineering.</p>
         <a href="/docs">Acessar a Documentação Interativa</a>
     </div>
+    <footer>
+        <p>Desenvolvido por Kayque Mendes &copy; <span id="current-year"></span></p>
+    </footer>
+    <script>
+        // Este script pega o ano atual e o insere no rodapé automaticamente
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>

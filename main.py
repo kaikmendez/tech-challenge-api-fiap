@@ -35,7 +35,7 @@ async def get_welcome_page():
     Serve a página HTML de boas-vindas a partir do arquivo index.html.
     """
     try:
-        with open("src/api/template/indez.html", "r", encoding="utf-8") as f:
+        with open("src/api/template/index.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         return HTMLResponse(content=html_content, status_code=200)
     except FileNotFoundError:
