@@ -7,7 +7,7 @@
 
 ## 📖 Descrição do Projeto
 
-[cite_start]Este projeto consiste na criação de uma API pública para consulta de livros, desenvolvida como parte do Tech Challenge da Fase 1 de Machine Learning Engineering. [cite: 8] [cite_start]O objetivo principal é construir um pipeline completo, desde a extração de dados via web scraping, passando pelo armazenamento e transformação, até a disponibilização desses dados através de uma API RESTful robusta e documentada. [cite: 11, 12]
+Este projeto consiste na criação de uma API pública para consulta de livros, desenvolvida como parte do Tech Challenge da Fase 1 de Machine Learning Engineering. O objetivo principal é construir um pipeline completo, desde a extração de dados via web scraping, passando pelo armazenamento e transformação, até a disponibilização desses dados através de uma API RESTful robusta e documentada.
 
 [cite_start]A arquitetura foi pensada para ser modular e escalável, servindo como a base para futuros sistemas de recomendação e modelos de Machine Learning. [cite: 12, 17]
 
