@@ -14,7 +14,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Contexto para hashing de senhas
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # Esquema OAuth2 para o FastAPI saber como extrair o token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
@@ -27,8 +27,7 @@ def verify_password(plain_password, hashed_password):
 
 def get_password_hash(password):
     """Gera o hash de uma senha."""
-    truncated_password = password[:72]
-    return pwd_context.hash(truncated_password)
+    return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Cria um novo token de acesso."""

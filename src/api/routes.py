@@ -136,7 +136,7 @@ def health_check():
 fake_users_db = {
     "admin": {
         "username": "admin",
-        "hashed_password": "$2b$12$EixZaYVK1e.JSs3J2o.4V.5n8h.y0p343b3hJ5wA5U3u.O5b.Bqje",
+        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$dQ4BQOidk/Leey+lFMJ4rw$JKenTSQe+mr7WkhHsIMEQ5qurAe11rJj3lJoEUKQM0E",
         "role": "admin"
     }
 }
@@ -148,11 +148,8 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     user = fake_users_db.get(form_data.username)
 
-    password_to_check = form_data.password[:72]
-    # --------------------------------
-
     # Usa a senha truncada na verificação para garantir consistência.
-    if not user or not verify_password(password_to_check, user["hashed_password"]):
+    if not user or not verify_password(form_data.password, user["hashed_password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
