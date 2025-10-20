@@ -14,14 +14,14 @@ async def lifespan(app: FastAPI):
     SetupDatabase.setup_initial_database()
     
     # (Opcional) Executa o scraping na inicialização
-    print("INFO:     Iniciando processo de scraping no startup...")
-    scraper = ScraperBook()
-    books = scraper.scrape_books()
-    if books:
-        scraper.save_on_db(books)
-        print("INFO:     Scraping e salvamento de dados concluídos.")
-    else:
-        print("WARNING:  Nenhum livro foi encontrado durante o scraping.")
+    # print("INFO:     Iniciando processo de scraping no startup...")
+    # scraper = ScraperBook()
+    # books = scraper.scrape_books()
+    # if books:
+    #     scraper.save_on_db(books)
+    #     print("INFO:     Scraping e salvamento de dados concluídos.")
+    # else:
+    #     print("WARNING:  Nenhum livro foi encontrado durante o scraping.")
     
     yield
     print("INFO:     API sendo desligada.")
