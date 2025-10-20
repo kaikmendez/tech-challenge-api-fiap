@@ -226,3 +226,32 @@ O código do projeto está organizado em módulos para facilitar a manutenção 
 ├── requirements.txt        # Dependências do projeto
 └── README.md               # Documentação
 ```
+
+## 🏛️ Arquitetura
+
+Aqui está o diagrama arquitetural do projeto, mostrando o fluxo de dados:
+
+```mermaid
+graph LR;
+    subgraph "Usuário"
+        A["Cliente (Navegador / Cientista de Dados)"]
+    end
+
+    subgraph "Plataforma de Nuvem (Ex: Render, Heroku)"
+        B["API RESTful (FastAPI)"]
+        D{"Web Scraper (Python)<br/>Processo de Startup"}
+        C[("Banco de Dados (SQLite)")]
+    end
+
+    subgraph "Fonte Externa"
+        E["Site books.toscrape.com"]
+    end
+
+    %% Fluxos
+    A -- "1. Requisição HTTP/S" --> B;
+    B -- "2. Retorna JSON" --> A;
+    
+    B -- "3. Consulta Livros" --> C;
+    
+    E -- "A. Extração HTML" --> D;
+    D -- "B. Salva os Dados no Banco" --> C;
